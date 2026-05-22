@@ -4,6 +4,7 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { CATEGORY_META, FocusItem } from "@/context/FocusContext";
 import { useColors } from "@/hooks/useColors";
+import { GlassSurface } from "./GlassSurface";
 
 interface Props {
   item: FocusItem;
@@ -31,6 +32,8 @@ function relativeTime(iso: string): string {
 export function HistoryItem({ item, onActivate }: Props) {
   const colors = useColors();
   const meta = CATEGORY_META[item.category];
+  const iconTint =
+    colors.scheme === "dark" ? "rgba(165,180,252,0.18)" : "rgba(79,70,229,0.12)";
 
   return (
     <Pressable
@@ -40,32 +43,27 @@ export function HistoryItem({ item, onActivate }: Props) {
         Haptics.selectionAsync().catch(() => undefined);
         onActivate(item.id);
       }}
-      style={({ pressed }) => [
-        styles.row,
-        {
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
-          opacity: pressed ? 0.7 : 1,
-        },
-      ]}
     >
-      <View
-        style={[
-          styles.iconBubble,
-          { backgroundColor: colors.primary + "22" },
-        ]}
-      >
-        <Ionicons name={meta.icon} size={18} color={colors.primary} />
-      </View>
-      <View style={styles.body}>
-        <Text style={[styles.text, { color: colors.foreground }]} numberOfLines={2}>
-          {item.text}
-        </Text>
-        <Text style={[styles.meta, { color: colors.muted }]}>
-          {meta.label} · {relativeTime(item.createdAt)}
-        </Text>
-      </View>
-      <Ionicons name="arrow-up-circle" size={22} color={colors.muted} />
+      {({ pressed }) => (
+        <GlassSurface
+          radius={18}
+          intensity="regular"
+          style={[styles.row, { opacity: pressed ? 0.75 : 1 }]}
+        >
+          <View style={[styles.iconBubble, { backgroundColor: iconTint }]}>
+            <Ionicons name={meta.icon} size={18} color={colors.primary} />
+          </View>
+          <View style={styles.body}>
+            <Text style={[styles.text, { color: colors.foreground }]} numberOfLines={2}>
+              {item.text}
+            </Text>
+            <Text style={[styles.meta, { color: colors.muted }]}>
+              {meta.label} · {relativeTime(item.createdAt)}
+            </Text>
+          </View>
+          <Ionicons name="arrow-up-circle" size={22} color={colors.muted} />
+        </GlassSurface>
+      )}
     </Pressable>
   );
 }
@@ -76,8 +74,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     padding: 14,
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
   },
   iconBubble: {
     width: 36,

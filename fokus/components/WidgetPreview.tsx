@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -8,10 +9,12 @@ import { useColors } from "@/hooks/useColors";
 export type WidgetSize = "small" | "medium" | "large";
 
 const DIMENSIONS: Record<WidgetSize, { width: number; height: number }> = {
-  small: { width: 155, height: 155 },
-  medium: { width: 329, height: 155 },
-  large: { width: 329, height: 345 },
+  small: { width: 170, height: 170 },
+  medium: { width: 360, height: 170 },
+  large: { width: 360, height: 360 },
 };
+
+const CORNER_RADIUS = 32;
 
 interface Props {
   size: WidgetSize;
@@ -51,6 +54,7 @@ export function WidgetPreview({ size, item, previewText, previewCategory }: Prop
 
   const isSmall = size === "small";
   const isLarge = size === "large";
+  const padding = isSmall ? 14 : 18;
 
   return (
     <View
@@ -59,8 +63,7 @@ export function WidgetPreview({ size, item, previewText, previewCategory }: Prop
         {
           width,
           height,
-          borderRadius: 22,
-          shadowColor: colors.scheme === "dark" ? "#000" : "#1F1B4B",
+          borderRadius: CORNER_RADIUS,
         },
       ]}
     >
@@ -68,24 +71,38 @@ export function WidgetPreview({ size, item, previewText, previewCategory }: Prop
         colors={colors.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.gradient, { borderRadius: 22 }]}
-      >
+        style={[styles.gradient, { borderRadius: CORNER_RADIUS }]}
+      />
+      <LinearGradient
+        colors={["rgba(255,255,255,0.22)", "transparent"]}
+        start={{ x: 0.2, y: 0 }}
+        end={{ x: 0.5, y: 0.5 }}
+        style={[styles.sheen, { borderRadius: CORNER_RADIUS }]}
+      />
+      <View style={[styles.rim, { borderRadius: CORNER_RADIUS }]} pointerEvents="none" />
+
+      <View style={[styles.content, { padding }]}>
         <View style={styles.header}>
-          <View style={styles.iconBubble}>
+          <View style={styles.iconPillWrap}>
+            <BlurView intensity={30} tint="light" style={styles.iconPillBlur} />
+            <View style={styles.iconPillTint} />
+            <View style={styles.iconPillRim} />
             <Ionicons name={meta.icon} size={isSmall ? 14 : 16} color="#FFFFFF" />
           </View>
           {!isSmall ? (
-            <Text style={styles.headerLabel} numberOfLines={1}>
-              {meta.label}
-            </Text>
+            <View style={styles.labelPillWrap}>
+              <BlurView intensity={28} tint="light" style={styles.labelPillBlur} />
+              <View style={styles.labelPillTint} />
+              <View style={styles.labelPillRim} />
+              <Text style={styles.headerLabel} numberOfLines={1}>
+                {meta.label.toUpperCase()}
+              </Text>
+            </View>
           ) : null}
         </View>
 
         <Text
-          style={[
-            styles.body,
-            isSmall ? styles.bodySmall : styles.bodyLarge,
-          ]}
+          style={[styles.body, isSmall ? styles.bodySmall : isLarge ? styles.bodyLarge : styles.bodyMedium]}
           numberOfLines={isSmall ? 4 : isLarge ? 8 : 4}
         >
           {text}
@@ -93,28 +110,41 @@ export function WidgetPreview({ size, item, previewText, previewCategory }: Prop
 
         <View style={styles.footer}>
           {isLarge ? (
-            <Text style={styles.footerLabel}>Last updated · {formatTime(createdAt)}</Text>
-          ) : null}
-          <Text style={styles.footerDate}>{formatDate(createdAt)}</Text>
+            <View style={{ gap: 6 }}>
+              <Text style={styles.footerLabel}>Last updated · {formatTime(createdAt)}</Text>
+              <View style={styles.accentBar} />
+            </View>
+          ) : (
+            <Text style={styles.footerDate}>{formatDate(createdAt)}</Text>
+          )}
         </View>
-
-        {isLarge ? <View style={styles.accentBar} /> : null}
-      </LinearGradient>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   outer: {
+    overflow: "hidden",
+    shadowColor: "#1F1B4B",
     shadowOpacity: 0.25,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 8,
   },
   gradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  sheen: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  rim: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.35)",
+  },
+  content: {
     flex: 1,
-    padding: 14,
-    overflow: "hidden",
     justifyContent: "space-between",
   },
   header: {
@@ -122,41 +152,65 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  iconBubble: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: "rgba(255,255,255,0.18)",
+  iconPillWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+  },
+  iconPillBlur: { ...StyleSheet.absoluteFillObject },
+  iconPillTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255,255,255,0.22)",
+  },
+  iconPillRim: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 15,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.55)",
+  },
+  labelPillWrap: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+  labelPillBlur: { ...StyleSheet.absoluteFillObject },
+  labelPillTint: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255,255,255,0.18)",
+  },
+  labelPillRim: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.45)",
   },
   headerLabel: {
-    color: "rgba(255,255,255,0.85)",
-    fontSize: 12,
-    fontWeight: "600",
-    letterSpacing: 0.4,
-    textTransform: "uppercase",
+    color: "rgba(255,255,255,0.95)",
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.8,
   },
   body: {
     color: "#FFFFFF",
     fontWeight: "700",
+    letterSpacing: -0.2,
   },
-  bodySmall: {
-    fontSize: 14,
-    lineHeight: 18,
-  },
-  bodyLarge: {
-    fontSize: 18,
-    lineHeight: 24,
-  },
+  bodySmall: { fontSize: 15, lineHeight: 19 },
+  bodyMedium: { fontSize: 18, lineHeight: 23 },
+  bodyLarge: { fontSize: 22, lineHeight: 28 },
   footer: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "space-between",
   },
   footerLabel: {
-    color: "rgba(255,255,255,0.7)",
+    color: "rgba(255,255,255,0.75)",
     fontSize: 11,
+    fontWeight: "500",
   },
   footerDate: {
     color: "rgba(255,255,255,0.85)",
@@ -164,13 +218,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   accentBar: {
-    position: "absolute",
-    left: 14,
-    right: 14,
-    bottom: 8,
     height: 2,
+    width: 56,
     borderRadius: 1,
-    backgroundColor: "rgba(245, 158, 11, 0.85)",
+    backgroundColor: "rgba(245, 158, 11, 0.95)",
   },
 });
 

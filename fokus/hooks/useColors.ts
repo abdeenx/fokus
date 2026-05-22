@@ -13,6 +13,7 @@ export interface ThemeColors {
   muted: string;
   border: string;
   gradient: readonly [string, string, ...string[]];
+  ambient: readonly [string, string, ...string[]];
 }
 
 export interface ActiveTheme extends ThemeColors {
@@ -33,6 +34,7 @@ export function useColors(): ActiveTheme {
     muted: palette.muted,
     border: palette.border,
     gradient: palette.gradient,
+    ambient: palette.ambient,
     scheme,
     radius: colors.radius,
   };

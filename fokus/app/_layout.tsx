@@ -11,14 +11,20 @@ export default function RootLayout() {
       <ErrorBoundary>
         <FocusProvider>
           <StatusBar style="auto" />
-          <Stack>
+          <Stack
+            screenOptions={{
+              headerTransparent: true,
+              headerBlurEffect: "systemUltraThinMaterial",
+              headerLargeTitle: false,
+              headerTitleStyle: { fontWeight: "700" },
+            }}
+          >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
               name="edit"
               options={{
                 presentation: "modal",
                 title: "Set focus",
-                headerLargeTitle: false,
               }}
             />
             <Stack.Screen name="guide" options={{ title: "Add widget" }} />

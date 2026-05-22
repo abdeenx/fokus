@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { AmbientBackdrop } from "@/components/AmbientBackdrop";
+import { GlassSurface } from "@/components/GlassSurface";
 import { WidgetPreview } from "@/components/WidgetPreview";
 import { useFocus, type IoniconName } from "@/context/FocusContext";
 import { useColors } from "@/hooks/useColors";
@@ -36,65 +38,55 @@ const STEPS: { title: string; body: string; icon: IoniconName }[] = [
 export default function GuideScreen() {
   const colors = useColors();
   const { current } = useFocus();
+  const iconTint =
+    colors.scheme === "dark" ? "rgba(165,180,252,0.18)" : "rgba(79,70,229,0.12)";
 
   return (
-    <ScrollView
-      style={{ backgroundColor: colors.background }}
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.previewWrap}>
-        <WidgetPreview size="medium" item={current} />
-      </View>
+    <View style={styles.root}>
+      <AmbientBackdrop />
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.previewWrap}>
+          <WidgetPreview size="medium" item={current} />
+        </View>
 
-      <Text style={[styles.intro, { color: colors.muted }]}>
-        Add the Fokus widget to your home screen so your daily anchor is always one glance away.
-      </Text>
+        <Text style={[styles.intro, { color: colors.muted }]}>
+          Add the Fokus widget to your home screen so your daily anchor is always one glance away.
+        </Text>
 
-      <View style={styles.steps}>
-        {STEPS.map((step, idx) => (
-          <View
-            key={step.title}
-            style={[
-              styles.step,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-            ]}
-          >
-            <View
-              style={[styles.stepNumber, { backgroundColor: colors.primary + "22" }]}
-            >
-              <Text style={[styles.stepNumberText, { color: colors.primary }]}>
-                {idx + 1}
-              </Text>
-            </View>
-            <View style={styles.stepBody}>
-              <View style={styles.stepTitleRow}>
-                <Ionicons name={step.icon} size={16} color={colors.primary} />
-                <Text style={[styles.stepTitle, { color: colors.foreground }]}>
-                  {step.title}
+        <View style={styles.steps}>
+          {STEPS.map((step, idx) => (
+            <GlassSurface key={step.title} radius={18} intensity="regular" style={styles.step}>
+              <View style={[styles.stepNumber, { backgroundColor: iconTint }]}>
+                <Text style={[styles.stepNumberText, { color: colors.primary }]}>
+                  {idx + 1}
                 </Text>
               </View>
-              <Text style={[styles.stepText, { color: colors.muted }]}>{step.body}</Text>
-            </View>
-          </View>
-        ))}
-      </View>
+              <View style={styles.stepBody}>
+                <View style={styles.stepTitleRow}>
+                  <Ionicons name={step.icon} size={16} color={colors.primary} />
+                  <Text style={[styles.stepTitle, { color: colors.foreground }]}>
+                    {step.title}
+                  </Text>
+                </View>
+                <Text style={[styles.stepText, { color: colors.muted }]}>{step.body}</Text>
+              </View>
+            </GlassSurface>
+          ))}
+        </View>
 
-      <View
-        style={[
-          styles.tip,
-          { backgroundColor: colors.surface, borderColor: colors.border },
-        ]}
-      >
-        <Ionicons name="bulb" size={18} color={colors.accent} />
-        <Text style={[styles.tipText, { color: colors.foreground }]}>
-          The widget refreshes automatically whenever you save a new focus in the app.
-        </Text>
-      </View>
-    </ScrollView>
+        <GlassSurface radius={18} intensity="thick" tinted style={styles.tip}>
+          <Ionicons name="bulb" size={18} color={colors.accent} />
+          <Text style={[styles.tipText, { color: colors.foreground }]}>
+            The widget refreshes automatically whenever you save a new focus in the app.
+          </Text>
+        </GlassSurface>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1 },
   content: { padding: 20, gap: 16, paddingBottom: 48 },
   previewWrap: { alignItems: "center", paddingVertical: 8 },
   intro: { fontSize: 14, textAlign: "center" },
@@ -103,8 +95,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     padding: 14,
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
   },
   stepNumber: {
     width: 32,
@@ -123,8 +113,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     padding: 14,
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
   },
   tipText: { flex: 1, fontSize: 13 },
 });

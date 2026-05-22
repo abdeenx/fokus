@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import { Link, router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
@@ -11,6 +12,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AmbientBackdrop } from "@/components/AmbientBackdrop";
+import { GlassSurface } from "@/components/GlassSurface";
 import { HistoryItem } from "@/components/HistoryItem";
 import { WidgetPreview, WidgetSize } from "@/components/WidgetPreview";
 import {
@@ -52,306 +55,351 @@ export default function HomeScreen() {
   }, [filter, history]);
 
   return (
-    <SafeAreaView
-      edges={["top"]}
-      style={[styles.safe, { backgroundColor: colors.background }]}
-    >
-      <FlatList
-        data={filteredHistory}
-        keyExtractor={(it) => it.id}
-        contentContainerStyle={styles.list}
-        ListHeaderComponent={
-          <View style={styles.headerWrap}>
-            <View style={styles.headerRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.greeting, { color: colors.muted }]}>
-                  {todayLabel()}
-                </Text>
-                <Text style={[styles.title, { color: colors.foreground }]}>
-                  Fokus
-                </Text>
-              </View>
-              <Link href="/settings" asChild>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Open settings"
-                  style={({ pressed }) => [
-                    styles.iconButton,
-                    {
-                      backgroundColor: colors.surface,
-                      borderColor: colors.border,
-                      opacity: pressed ? 0.7 : 1,
-                    },
-                  ]}
-                >
-                  <Ionicons name="settings-outline" size={20} color={colors.foreground} />
-                </Pressable>
-              </Link>
-            </View>
-
-            {current ? (
-              <View
-                style={[
-                  styles.currentCard,
-                  { backgroundColor: colors.surface, borderColor: colors.border },
-                ]}
-              >
-                <View style={styles.currentHeader}>
-                  <View
-                    style={[styles.categoryBubble, { backgroundColor: colors.primary + "22" }]}
-                  >
-                    <Ionicons
-                      name={CATEGORY_META[current.category].icon}
-                      size={16}
-                      color={colors.primary}
-                    />
-                  </View>
-                  <Text style={[styles.categoryLabel, { color: colors.primary }]}>
-                    {CATEGORY_META[current.category].label.toUpperCase()}
+    <View style={styles.root}>
+      <AmbientBackdrop />
+      <SafeAreaView edges={["top"]} style={styles.safe}>
+        <FlatList
+          data={filteredHistory}
+          keyExtractor={(it) => it.id}
+          contentContainerStyle={styles.list}
+          ListHeaderComponent={
+            <View style={styles.headerWrap}>
+              <View style={styles.headerRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.greeting, { color: colors.muted }]}>
+                    {todayLabel()}
                   </Text>
+                  <Text style={[styles.title, { color: colors.foreground }]}>Fokus</Text>
                 </View>
-                <Text style={[styles.currentText, { color: colors.foreground }]}>
-                  {current.text}
-                </Text>
-                <Link href="/edit" asChild>
+                <Link href="/settings" asChild>
                   <Pressable
                     accessibilityRole="button"
-                    style={({ pressed }) => [
-                      styles.editButton,
-                      { borderColor: colors.border, opacity: pressed ? 0.7 : 1 },
-                    ]}
+                    accessibilityLabel="Open settings"
+                    hitSlop={8}
                   >
-                    <Ionicons name="create-outline" size={16} color={colors.foreground} />
-                    <Text style={[styles.editLabel, { color: colors.foreground }]}>Edit</Text>
+                    {({ pressed }) => (
+                      <GlassSurface
+                        radius={22}
+                        intensity="regular"
+                        style={[
+                          styles.iconButton,
+                          { opacity: pressed ? 0.7 : 1 },
+                        ]}
+                      >
+                        <Ionicons
+                          name="settings-outline"
+                          size={20}
+                          color={colors.foreground}
+                        />
+                      </GlassSurface>
+                    )}
                   </Pressable>
                 </Link>
               </View>
-            ) : (
-              <View
-                style={[
-                  styles.emptyCard,
-                  { backgroundColor: colors.surface, borderColor: colors.border },
-                ]}
-              >
-                <Ionicons name="sparkles" size={28} color={colors.primary} />
-                <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
-                  No focus yet today
-                </Text>
-                <Text style={[styles.emptyBody, { color: colors.muted }]}>
-                  Pick one short anchor and we'll keep it on your home screen.
-                </Text>
-                <Link href="/edit" asChild>
-                  <Pressable
-                    accessibilityRole="button"
-                    style={({ pressed }) => [
-                      styles.primaryButton,
-                      { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
-                    ]}
-                  >
-                    <Text style={[styles.primaryButtonLabel, { color: colors.primaryFg }]}>
-                      Set today's focus
-                    </Text>
-                  </Pressable>
-                </Link>
-              </View>
-            )}
 
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
+              {current ? (
+                <GlassSurface radius={26} intensity="thick" tinted style={styles.currentCard}>
+                  <View style={styles.currentHeader}>
+                    <View
+                      style={[
+                        styles.categoryBubble,
+                        {
+                          backgroundColor:
+                            colors.scheme === "dark"
+                              ? "rgba(165,180,252,0.18)"
+                              : "rgba(79,70,229,0.14)",
+                        },
+                      ]}
+                    >
+                      <Ionicons
+                        name={CATEGORY_META[current.category].icon}
+                        size={16}
+                        color={colors.primary}
+                      />
+                    </View>
+                    <Text style={[styles.categoryLabel, { color: colors.primary }]}>
+                      {CATEGORY_META[current.category].label.toUpperCase()}
+                    </Text>
+                  </View>
+                  <Text style={[styles.currentText, { color: colors.foreground }]}>
+                    {current.text}
+                  </Text>
+                  <Link href="/edit" asChild>
+                    <Pressable accessibilityRole="button" hitSlop={6}>
+                      {({ pressed }) => (
+                        <GlassSurface
+                          radius={14}
+                          intensity="thin"
+                          style={[
+                            styles.editButton,
+                            { opacity: pressed ? 0.7 : 1 },
+                          ]}
+                        >
+                          <Ionicons
+                            name="create-outline"
+                            size={16}
+                            color={colors.foreground}
+                          />
+                          <Text style={[styles.editLabel, { color: colors.foreground }]}>
+                            Edit
+                          </Text>
+                        </GlassSurface>
+                      )}
+                    </Pressable>
+                  </Link>
+                </GlassSurface>
+              ) : (
+                <GlassSurface radius={26} intensity="thick" tinted style={styles.emptyCard}>
+                  <Ionicons name="sparkles" size={28} color={colors.primary} />
+                  <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
+                    No focus yet today
+                  </Text>
+                  <Text style={[styles.emptyBody, { color: colors.muted }]}>
+                    Pick one short anchor and we'll keep it on your home screen.
+                  </Text>
+                  <Link href="/edit" asChild>
+                    <Pressable accessibilityRole="button" style={styles.primaryButtonWrap}>
+                      {({ pressed }) => (
+                        <LinearGradient
+                          colors={colors.gradient}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={[
+                            styles.primaryButton,
+                            { opacity: pressed ? 0.9 : 1 },
+                          ]}
+                        >
+                          <Text style={[styles.primaryButtonLabel, { color: "#FFFFFF" }]}>
+                            Set today's focus
+                          </Text>
+                        </LinearGradient>
+                      )}
+                    </Pressable>
+                  </Link>
+                </GlassSurface>
+              )}
+
+              <View style={styles.section}>
+                <View style={styles.sectionHeader}>
+                  <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
+                    Widget preview
+                  </Text>
+                  <Link href="/guide" asChild>
+                    <Pressable
+                      accessibilityRole="button"
+                      style={({ pressed }) => [styles.sectionLink, { opacity: pressed ? 0.7 : 1 }]}
+                    >
+                      <Text style={[styles.sectionLinkText, { color: colors.primary }]}>
+                        Add to home screen
+                      </Text>
+                      <Ionicons name="chevron-forward" size={14} color={colors.primary} />
+                    </Pressable>
+                  </Link>
+                </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.sizeRow}
+                  contentContainerStyle={{ gap: 8, paddingHorizontal: 20 }}
+                >
+                  {SIZES.map((s) => {
+                    const active = s === size;
+                    return (
+                      <Pressable
+                        key={s}
+                        accessibilityRole="button"
+                        onPress={() => setSize(s)}
+                      >
+                        {({ pressed }) =>
+                          active ? (
+                            <LinearGradient
+                              colors={colors.gradient}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 1, y: 1 }}
+                              style={[
+                                styles.sizeChip,
+                                styles.sizeChipActive,
+                                { opacity: pressed ? 0.9 : 1 },
+                              ]}
+                            >
+                              <Text style={[styles.sizeChipLabel, { color: "#FFFFFF" }]}>
+                                {s[0].toUpperCase() + s.slice(1)}
+                              </Text>
+                            </LinearGradient>
+                          ) : (
+                            <GlassSurface
+                              radius={999}
+                              intensity="regular"
+                              style={[styles.sizeChip, { opacity: pressed ? 0.85 : 1 }]}
+                            >
+                              <Text style={[styles.sizeChipLabel, { color: colors.foreground }]}>
+                                {s[0].toUpperCase() + s.slice(1)}
+                              </Text>
+                            </GlassSurface>
+                          )
+                        }
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+                <View style={styles.previewWrap}>
+                  <WidgetPreview size={size} item={current} />
+                </View>
+              </View>
+
+              <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: colors.foreground }]}>
-                  Widget preview
+                  History
                 </Text>
-                <Link href="/guide" asChild>
-                  <Pressable
-                    accessibilityRole="button"
-                    style={({ pressed }) => [styles.sectionLink, { opacity: pressed ? 0.7 : 1 }]}
-                  >
-                    <Text style={[styles.sectionLinkText, { color: colors.primary }]}>
-                      Add to home screen
-                    </Text>
-                    <Ionicons name="chevron-forward" size={14} color={colors.primary} />
-                  </Pressable>
-                </Link>
-              </View>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.sizeRow}
-                contentContainerStyle={{ gap: 8 }}
-              >
-                {SIZES.map((s) => {
-                  const active = s === size;
-                  return (
-                    <Pressable
-                      key={s}
-                      accessibilityRole="button"
-                      onPress={() => setSize(s)}
-                      style={({ pressed }) => [
-                        styles.sizeChip,
-                        {
-                          backgroundColor: active ? colors.primary : colors.surface,
-                          borderColor: active ? colors.primary : colors.border,
-                          opacity: pressed ? 0.85 : 1,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.sizeChipLabel,
-                          { color: active ? colors.primaryFg : colors.foreground },
-                        ]}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={styles.filterRow}
+                  contentContainerStyle={{ gap: 8, paddingHorizontal: 20 }}
+                >
+                  {FILTERS.map((f) => {
+                    const active = f.value === filter;
+                    return (
+                      <Pressable
+                        key={f.value}
+                        accessibilityRole="button"
+                        onPress={() => setFilter(f.value)}
                       >
-                        {s[0].toUpperCase() + s.slice(1)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
-              <View style={styles.previewWrap}>
-                <WidgetPreview size={size} item={current} />
+                        {({ pressed }) =>
+                          active ? (
+                            <LinearGradient
+                              colors={colors.gradient}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 1, y: 1 }}
+                              style={[
+                                styles.filterChip,
+                                styles.filterChipActive,
+                                { opacity: pressed ? 0.9 : 1 },
+                              ]}
+                            >
+                              <Text style={[styles.filterChipLabel, { color: "#FFFFFF" }]}>
+                                {f.label}
+                              </Text>
+                            </LinearGradient>
+                          ) : (
+                            <GlassSurface
+                              radius={999}
+                              intensity="regular"
+                              style={[styles.filterChip, { opacity: pressed ? 0.85 : 1 }]}
+                            >
+                              <Text
+                                style={[styles.filterChipLabel, { color: colors.foreground }]}
+                              >
+                                {f.label}
+                              </Text>
+                            </GlassSurface>
+                          )
+                        }
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
               </View>
             </View>
-
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.foreground }]}>History</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.filterRow}
-                contentContainerStyle={{ gap: 8 }}
-              >
-                {FILTERS.map((f) => {
-                  const active = f.value === filter;
-                  return (
-                    <Pressable
-                      key={f.value}
-                      accessibilityRole="button"
-                      onPress={() => setFilter(f.value)}
-                      style={({ pressed }) => [
-                        styles.filterChip,
-                        {
-                          backgroundColor: active ? colors.primary : colors.surface,
-                          borderColor: active ? colors.primary : colors.border,
-                          opacity: pressed ? 0.85 : 1,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.filterChipLabel,
-                          { color: active ? colors.primaryFg : colors.foreground },
-                        ]}
-                      >
-                        {f.label}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
+          }
+          renderItem={({ item }) => (
+            <View style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
+              <HistoryItem item={item} onActivate={activateHistoryItem} />
             </View>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <View style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
-            <HistoryItem item={item} onActivate={activateHistoryItem} />
-          </View>
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyHistory}>
-            <Text style={[styles.emptyHistoryText, { color: colors.muted }]}>
-              {history.length === 0
-                ? "Saved focuses will appear here."
-                : "Nothing in this category yet."}
-            </Text>
-          </View>
-        }
-      />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyHistory}>
+              <Text style={[styles.emptyHistoryText, { color: colors.muted }]}>
+                {history.length === 0
+                  ? "Saved focuses will appear here."
+                  : "Nothing in this category yet."}
+              </Text>
+            </View>
+          }
+        />
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Set a new focus"
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
-          router.push("/edit");
-        }}
-        style={({ pressed }) => [
-          styles.fab,
-          {
-            backgroundColor: colors.primary,
-            shadowColor: colors.primary,
-            opacity: pressed ? 0.9 : 1,
-          },
-        ]}
-      >
-        <Ionicons name="add" size={28} color={colors.primaryFg} />
-      </Pressable>
-    </SafeAreaView>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Set a new focus"
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
+            router.push("/edit");
+          }}
+          style={styles.fabWrap}
+        >
+          {({ pressed }) => (
+            <LinearGradient
+              colors={colors.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.fab, { opacity: pressed ? 0.9 : 1 }]}
+            >
+              <View style={styles.fabRim} />
+              <Ionicons name="add" size={28} color="#FFFFFF" />
+            </LinearGradient>
+          )}
+        </Pressable>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1 },
   safe: { flex: 1 },
-  list: { paddingBottom: 120 },
-  headerWrap: { paddingTop: 8, gap: 16 },
+  list: { paddingBottom: 140 },
+  headerWrap: { paddingTop: 8, gap: 18 },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 20,
     gap: 12,
   },
-  greeting: { fontSize: 13 },
-  title: { fontSize: 28, fontWeight: "800", letterSpacing: -0.4 },
+  greeting: { fontSize: 13, letterSpacing: 0.2 },
+  title: { fontSize: 30, fontWeight: "800", letterSpacing: -0.6 },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: StyleSheet.hairlineWidth,
   },
   currentCard: {
     marginHorizontal: 20,
-    padding: 18,
-    borderRadius: 18,
-    borderWidth: StyleSheet.hairlineWidth,
+    padding: 20,
     gap: 14,
   },
   currentHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
   categoryBubble: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
   },
-  categoryLabel: { fontSize: 11, fontWeight: "700", letterSpacing: 0.6 },
-  currentText: { fontSize: 22, fontWeight: "700", lineHeight: 28 },
+  categoryLabel: { fontSize: 11, fontWeight: "700", letterSpacing: 0.8 },
+  currentText: { fontSize: 24, fontWeight: "700", lineHeight: 30, letterSpacing: -0.2 },
   editButton: {
     alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 14,
+    paddingVertical: 9,
   },
   editLabel: { fontSize: 13, fontWeight: "600" },
   emptyCard: {
     marginHorizontal: 20,
     padding: 24,
-    borderRadius: 18,
-    borderWidth: StyleSheet.hairlineWidth,
     alignItems: "center",
     gap: 10,
   },
   emptyTitle: { fontSize: 18, fontWeight: "700" },
   emptyBody: { textAlign: "center", fontSize: 14 },
+  primaryButtonWrap: { marginTop: 8, borderRadius: 14, overflow: "hidden" },
   primaryButton: {
-    marginTop: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 22,
+    paddingVertical: 13,
+    borderRadius: 14,
   },
   primaryButtonLabel: { fontSize: 15, fontWeight: "700" },
   section: { gap: 12 },
@@ -361,40 +409,53 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
   },
-  sectionTitle: { fontSize: 16, fontWeight: "700", paddingHorizontal: 20 },
+  sectionTitle: { fontSize: 17, fontWeight: "700", paddingHorizontal: 20, letterSpacing: -0.2 },
   sectionLink: { flexDirection: "row", alignItems: "center", gap: 2 },
   sectionLinkText: { fontSize: 13, fontWeight: "600" },
-  sizeRow: { paddingHorizontal: 20 },
+  sizeRow: {},
   sizeChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    alignItems: "center",
+    justifyContent: "center",
   },
+  sizeChipActive: { borderRadius: 999 },
   sizeChipLabel: { fontSize: 13, fontWeight: "600" },
   previewWrap: { alignItems: "center", paddingVertical: 8 },
-  filterRow: { paddingHorizontal: 20 },
+  filterRow: {},
   filterChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    alignItems: "center",
+    justifyContent: "center",
   },
+  filterChipActive: { borderRadius: 999 },
   filterChipLabel: { fontSize: 13, fontWeight: "600" },
   emptyHistory: { paddingHorizontal: 20, paddingVertical: 24, alignItems: "center" },
   emptyHistoryText: { fontSize: 13 },
-  fab: {
+  fabWrap: {
     position: "absolute",
-    bottom: 28,
+    bottom: 30,
     right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    borderRadius: 32,
+    shadowColor: "#4F46E5",
+    shadowOpacity: 0.4,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
+  },
+  fab: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+    overflow: "hidden",
+  },
+  fabRim: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 30,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.6)",
   },
 });
