@@ -284,16 +284,18 @@ function registerExtensionTarget(config) {
       }
     });
 
-    // 4) Walk the widget folder and add each file to the right phase.
+    // 4) Walk the widget folder and add each file to the right phase. The
+    //    parent PBXGroup already carries `path = "FokusWidget"`, so file refs
+    //    only need the bare filename (otherwise xcode doubles the prefix).
     for (const entry of fs.readdirSync(widgetRoot, { withFileTypes: true })) {
       if (!entry.isFile()) continue;
-      const relPath = path.join(WIDGET_NAME, entry.name);
-      if (entry.name.endsWith(".swift")) {
-        project.addSourceFile(relPath, { target: target.uuid }, pbxGroup.uuid);
-      } else if (entry.name === "Info.plist" || entry.name.endsWith(".entitlements")) {
-        project.addFile(relPath, pbxGroup.uuid, { target: target.uuid });
+      const fileName = entry.name;
+      if (fileName.endsWith(".swift")) {
+        project.addSourceFile(fileName, { target: target.uuid }, pbxGroup.uuid);
+      } else if (fileName === "Info.plist" || fileName.endsWith(".entitlements")) {
+        project.addFile(fileName, pbxGroup.uuid, { target: target.uuid });
       } else {
-        project.addResourceFile(relPath, { target: target.uuid }, pbxGroup.uuid);
+        project.addResourceFile(fileName, { target: target.uuid }, pbxGroup.uuid);
       }
     }
 
