@@ -10,4 +10,4 @@ echo "› Installing dependencies..."
 npm install
 
 echo "› Building and installing on device..."
-npx expo run:ios --device --no-install
+npx expo run:ios --device
