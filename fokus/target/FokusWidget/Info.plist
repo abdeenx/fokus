@@ -22,6 +22,8 @@
   <string>1</string>
   <key>FokusAppGroupID</key>
   <string>group.com.example.fokus</string>
+  <key>NSSupportsLiveActivities</key>
+  <true/>
   <key>NSExtension</key>
   <dict>
     <key>NSExtensionPointIdentifier</key>

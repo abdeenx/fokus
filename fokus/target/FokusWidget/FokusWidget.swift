@@ -228,6 +228,64 @@ struct FokusLargeView: View {
     }
 }
 
+// MARK: - Lock Screen accessory variants
+
+/// Circular accessory (iOS 16+). Lock Screen rendering mode is monochrome with
+/// vibrancy, so we only emit a glyph + a small indicator ring.
+struct FokusAccessoryCircularView: View {
+    let entry: FokusProvider.Entry
+    var body: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            VStack(spacing: 2) {
+                Image(systemName: entry.data.iconName)
+                    .font(.system(size: 16, weight: .semibold))
+                Text(entry.data.displayLabel.uppercased())
+                    .font(.system(size: 8, weight: .heavy))
+                    .tracking(0.5)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            .padding(6)
+        }
+        .widgetAccentable()
+    }
+}
+
+/// Rectangular accessory (iOS 16+). Shows the category + truncated text.
+struct FokusAccessoryRectangularView: View {
+    let entry: FokusProvider.Entry
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 4) {
+                Image(systemName: entry.data.iconName)
+                    .font(.system(size: 11, weight: .semibold))
+                Text(entry.data.displayLabel.uppercased())
+                    .font(.system(size: 10, weight: .heavy))
+                    .tracking(0.6)
+            }
+            .widgetAccentable()
+            Text(entry.data.text)
+                .font(.system(size: 13, weight: .semibold))
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// Inline accessory (iOS 16+). One short line above the clock.
+struct FokusAccessoryInlineView: View {
+    let entry: FokusProvider.Entry
+    var body: some View {
+        Label {
+            Text(entry.data.text)
+        } icon: {
+            Image(systemName: entry.data.iconName)
+        }
+    }
+}
+
 struct FokusWidgetEntryView: View {
     var entry: FokusProvider.Entry
     @Environment(\.widgetFamily) var family
@@ -240,8 +298,33 @@ struct FokusWidgetEntryView: View {
             FokusMediumView(entry: entry)
         case .systemLarge:
             FokusLargeView(entry: entry)
+        case .accessoryCircular:
+            FokusAccessoryCircularView(entry: entry)
+        case .accessoryRectangular:
+            FokusAccessoryRectangularView(entry: entry)
+        case .accessoryInline:
+            FokusAccessoryInlineView(entry: entry)
         default:
             FokusSmallView(entry: entry)
+        }
+    }
+}
+
+/// Picks the right background per-family at render time. Home-screen families
+/// get the indigo gradient + sheen; accessory (Lock Screen) families get a
+/// fully transparent background so the system vibrancy can take over.
+struct FokusContainerBackground: View {
+    @Environment(\.widgetFamily) var family
+
+    var body: some View {
+        switch family {
+        case .accessoryCircular, .accessoryRectangular, .accessoryInline:
+            Color.clear
+        default:
+            ZStack {
+                FokusGradient()
+                FokusSheen()
+            }
         }
     }
 }
@@ -252,14 +335,18 @@ struct FokusWidget: Widget {
         StaticConfiguration(kind: kind, provider: FokusProvider()) { entry in
             FokusWidgetEntryView(entry: entry)
                 .containerBackground(for: .widget) {
-                    ZStack {
-                        FokusGradient()
-                        FokusSheen()
-                    }
+                    FokusContainerBackground()
                 }
         }
         .configurationDisplayName("Fokus")
         .description("Your daily focus, always visible.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium,
+            .systemLarge,
+            .accessoryCircular,
+            .accessoryRectangular,
+            .accessoryInline,
+        ])
     }
 }

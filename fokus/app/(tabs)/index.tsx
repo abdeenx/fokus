@@ -45,7 +45,14 @@ function todayLabel(): string {
 
 export default function HomeScreen() {
   const colors = useColors();
-  const { current, history, activateHistoryItem } = useFocus();
+  const {
+    current,
+    history,
+    activateHistoryItem,
+    liveActivityPinned,
+    pinToLockScreen,
+    unpinFromLockScreen,
+  } = useFocus();
   const [filter, setFilter] = useState<FilterValue>("all");
   const [size, setSize] = useState<WidgetSize>("medium");
 
@@ -124,29 +131,89 @@ export default function HomeScreen() {
                   <Text style={[styles.currentText, { color: colors.foreground }]}>
                     {current.text}
                   </Text>
-                  <Link href="/edit" asChild>
-                    <Pressable accessibilityRole="button" hitSlop={6}>
-                      {({ pressed }) => (
-                        <GlassSurface
-                          radius={14}
-                          intensity="thin"
-                          style={[
-                            styles.editButton,
-                            { opacity: pressed ? 0.7 : 1 },
-                          ]}
-                        >
-                          <Ionicons
-                            name="create-outline"
-                            size={16}
-                            color={colors.foreground}
-                          />
-                          <Text style={[styles.editLabel, { color: colors.foreground }]}>
-                            Edit
-                          </Text>
-                        </GlassSurface>
-                      )}
+                  <View style={styles.cardActions}>
+                    <Link href="/edit" asChild>
+                      <Pressable accessibilityRole="button" hitSlop={6}>
+                        {({ pressed }) => (
+                          <GlassSurface
+                            radius={14}
+                            intensity="thin"
+                            style={[
+                              styles.editButton,
+                              { opacity: pressed ? 0.7 : 1 },
+                            ]}
+                          >
+                            <Ionicons
+                              name="create-outline"
+                              size={16}
+                              color={colors.foreground}
+                            />
+                            <Text style={[styles.editLabel, { color: colors.foreground }]}>
+                              Edit
+                            </Text>
+                          </GlassSurface>
+                        )}
+                      </Pressable>
+                    </Link>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        liveActivityPinned
+                          ? "Unpin from Lock Screen"
+                          : "Pin to Lock Screen"
+                      }
+                      hitSlop={6}
+                      onPress={() => {
+                        Haptics.selectionAsync().catch(() => undefined);
+                        if (liveActivityPinned) {
+                          unpinFromLockScreen().catch(() => undefined);
+                        } else {
+                          pinToLockScreen().catch(() => undefined);
+                        }
+                      }}
+                    >
+                      {({ pressed }) =>
+                        liveActivityPinned ? (
+                          <LinearGradient
+                            colors={colors.gradient}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={[
+                              styles.editButton,
+                              styles.pinActive,
+                              { opacity: pressed ? 0.9 : 1 },
+                            ]}
+                          >
+                            <View style={styles.pinActiveRim} pointerEvents="none" />
+                            <Ionicons name="lock-closed" size={14} color="#FFFFFF" />
+                            <Text style={[styles.editLabel, { color: "#FFFFFF" }]}>
+                              Pinned
+                            </Text>
+                          </LinearGradient>
+                        ) : (
+                          <GlassSurface
+                            radius={14}
+                            intensity="thin"
+                            style={[
+                              styles.editButton,
+                              { opacity: pressed ? 0.7 : 1 },
+                            ]}
+                          >
+                            <Ionicons
+                              name="lock-open-outline"
+                              size={16}
+                              color={colors.foreground}
+                            />
+                            <Text
+                              style={[styles.editLabel, { color: colors.foreground }]}
+                            >
+                              Pin to Lock Screen
+                            </Text>
+                          </GlassSurface>
+                        )
+                      }
                     </Pressable>
-                  </Link>
+                  </View>
                 </GlassSurface>
               ) : (
                 <GlassSurface radius={26} intensity="thick" tinted style={styles.emptyCard}>
@@ -378,13 +445,27 @@ const styles = StyleSheet.create({
   },
   categoryLabel: { fontSize: 11, fontWeight: "700", letterSpacing: 0.8 },
   currentText: { fontSize: 24, fontWeight: "700", lineHeight: 30, letterSpacing: -0.2 },
+  cardActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
   editButton: {
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 14,
     paddingVertical: 9,
+  },
+  pinActive: {
+    borderRadius: 14,
+    overflow: "hidden",
+  },
+  pinActiveRim: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.5)",
   },
   editLabel: { fontSize: 13, fontWeight: "600" },
   emptyCard: {

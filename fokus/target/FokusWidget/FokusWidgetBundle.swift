@@ -3,5 +3,11 @@ import SwiftUI
 
 @main
 struct FokusWidgetBundle: WidgetBundle {
-    var body: some Widget { FokusWidget() }
+    @WidgetBundleBuilder
+    var body: some Widget {
+        FokusWidget()
+        if #available(iOS 16.2, *) {
+            FokusLiveActivity()
+        }
+    }
 }
