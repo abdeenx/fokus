@@ -94,95 +94,89 @@ private struct FokusGradient: View {
 struct FokusSmallView: View {
     let entry: FokusProvider.Entry
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            FokusGradient()
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: entry.data.iconName)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(6)
-                    .background(Color.white.opacity(0.18))
-                    .clipShape(Circle())
-                Spacer(minLength: 0)
-                Text(entry.data.text)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(.white)
-                    .lineLimit(4)
-                    .minimumScaleFactor(0.75)
-            }
-            .padding(12)
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: entry.data.iconName)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white)
+                .padding(6)
+                .background(Color.white.opacity(0.18))
+                .clipShape(Circle())
+            Spacer(minLength: 0)
+            Text(entry.data.text)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.white)
+                .lineLimit(4)
+                .minimumScaleFactor(0.75)
+                .multilineTextAlignment(.leading)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
 struct FokusMediumView: View {
     let entry: FokusProvider.Entry
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            FokusGradient()
-            VStack(alignment: .leading, spacing: 10) {
-                HStack(spacing: 8) {
-                    Image(systemName: entry.data.iconName)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.white)
-                        .padding(6)
-                        .background(Color.white.opacity(0.18))
-                        .clipShape(Circle())
-                    Text(entry.data.displayLabel.uppercased())
-                        .font(.system(size: 11, weight: .bold))
-                        .tracking(0.6)
-                        .foregroundColor(.white.opacity(0.85))
-                    Spacer()
-                }
-                Text(entry.data.text)
-                    .font(.system(size: 16, weight: .bold))
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: entry.data.iconName)
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
-                    .lineLimit(4)
-                    .minimumScaleFactor(0.8)
-                Spacer(minLength: 0)
+                    .padding(6)
+                    .background(Color.white.opacity(0.18))
+                    .clipShape(Circle())
+                Text(entry.data.displayLabel.uppercased())
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(0.6)
+                    .foregroundColor(.white.opacity(0.85))
+                Spacer()
             }
-            .padding(14)
+            Text(entry.data.text)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(.white)
+                .lineLimit(4)
+                .minimumScaleFactor(0.8)
+                .multilineTextAlignment(.leading)
+            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
 struct FokusLargeView: View {
     let entry: FokusProvider.Entry
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            FokusGradient()
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 8) {
-                    Image(systemName: entry.data.iconName)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(Color.white.opacity(0.18))
-                        .clipShape(Circle())
-                    Text(entry.data.displayLabel.uppercased())
-                        .font(.system(size: 12, weight: .bold))
-                        .tracking(0.6)
-                        .foregroundColor(.white.opacity(0.85))
-                    Spacer()
-                }
-                Text(entry.data.text)
-                    .font(.system(size: 22, weight: .bold))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: entry.data.iconName)
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
-                    .lineLimit(10)
-                    .minimumScaleFactor(0.7)
+                    .padding(8)
+                    .background(Color.white.opacity(0.18))
+                    .clipShape(Circle())
+                Text(entry.data.displayLabel.uppercased())
+                    .font(.system(size: 12, weight: .bold))
+                    .tracking(0.6)
+                    .foregroundColor(.white.opacity(0.85))
                 Spacer()
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Last updated · \(entry.data.lastUpdatedLabel)")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.white.opacity(0.75))
-                    Rectangle()
-                        .fill(Color(red: 0.96, green: 0.62, blue: 0.04))
-                        .frame(height: 2)
-                        .cornerRadius(1)
-                }
             }
-            .padding(16)
+            Text(entry.data.text)
+                .font(.system(size: 22, weight: .bold))
+                .foregroundColor(.white)
+                .lineLimit(10)
+                .minimumScaleFactor(0.7)
+                .multilineTextAlignment(.leading)
+            Spacer()
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Last updated · \(entry.data.lastUpdatedLabel)")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.white.opacity(0.75))
+                Rectangle()
+                    .fill(Color(red: 0.96, green: 0.62, blue: 0.04))
+                    .frame(height: 2)
+                    .cornerRadius(1)
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
@@ -209,7 +203,9 @@ struct FokusWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: FokusProvider()) { entry in
             FokusWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(for: .widget) {
+                    FokusGradient()
+                }
         }
         .configurationDisplayName("Fokus")
         .description("Your daily focus, always visible.")
