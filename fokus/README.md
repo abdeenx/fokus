@@ -38,6 +38,17 @@ npm run ios:device
 
 > Settings → General → VPN & Device Management → tap your developer profile → Trust.
 
+### Build & install a standalone app
+
+```bash
+npx expo run:ios --device --configuration Release
+```
+
+For a specific connected iPhone:
+```bash
+npx expo run:ios --device "Ahmed’s iPhone" --configuration Release
+```
+
 ### Add the widget to your home screen
 
 1. Long-press an empty spot on the home screen until the icons jiggle.
