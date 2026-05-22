@@ -1,0 +1,38 @@
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Generated native projects
+ios/
+android/
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+
+# Env
+.env*
+!.env.example
+
+# Logs
+*.log
+
+# Local
+.idea/
+.vscode/

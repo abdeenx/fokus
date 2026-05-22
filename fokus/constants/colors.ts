@@ -1,0 +1,25 @@
+export default {
+  light: {
+    primary: "#4F46E5",
+    primaryFg: "#FFFFFF",
+    accent: "#F59E0B",
+    background: "#F5F4FB",
+    surface: "#FFFFFF",
+    foreground: "#0F0E17",
+    muted: "#6B7280",
+    border: "#E5E7EB",
+    gradient: ["#6366F1", "#4F46E5", "#4338CA"] as const,
+  },
+  dark: {
+    primary: "#818CF8",
+    primaryFg: "#0F0E17",
+    accent: "#FBBF24",
+    background: "#0F0E17",
+    surface: "#1A1A2E",
+    foreground: "#F5F4FB",
+    muted: "#9CA3AF",
+    border: "#2A2A3E",
+    gradient: ["#4338CA", "#4F46E5", "#6366F1"] as const,
+  },
+  radius: 14,
+} as const;
